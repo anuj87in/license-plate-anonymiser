@@ -69,6 +69,12 @@
     .stat { padding: 16px; }
     .stat b { display: block; font-size: 1.6rem; line-height: 1.2; }
     .stat span { color: var(--muted); font-size: .9rem; }
+    a.report { display: flex; gap: 14px; align-items: center; margin-top: 12px; padding: 16px 18px; color: var(--text); text-decoration: none; }
+    a.report:hover { border-color: var(--accent); }
+    a.report:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    a.report strong { display: block; color: var(--accent); }
+    .report-icon { font-size: 1.6rem; }
+    .report-sub { display: block; color: var(--muted); font-size: .9rem; }
     ol, ul { padding-left: 20px; margin: 0; }
     li { margin: 6px 0; }
     .note { padding: 16px 18px; color: var(--muted); font-size: .93rem; }
@@ -140,6 +146,11 @@
     <div class="card stat"><b>25K</b><span>training images, fine-tuned from YOLOv8s</span></div>
     <div class="card stat"><b>22 MB</b><span>model, downloaded once and cached by the browser</span></div>
   </div>
+  <a class="card report" href="report/License_Plate_Anonymisation_Report.pdf" target="_blank" rel="noopener">
+    <span class="report-icon" aria-hidden="true">📄</span>
+    <span><strong>Read the full technical report</strong>
+      <span class="report-sub">Data audit, exploratory analysis, model design, training and evaluation · PDF, 31 pages, 6 MB</span></span>
+  </a>
 
   <h2>Limitations</h2>
   <div class="card note">
