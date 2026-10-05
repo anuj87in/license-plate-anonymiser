@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>License Plate Anonymiser</title>
+  <meta name="description" content="Blur license plates in your photos. A YOLOv8 model runs entirely in your browser, so your image is never uploaded.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='3' y='9' width='26' height='14' rx='3' fill='%232563eb'/><rect x='7' y='13' width='18' height='6' rx='1' fill='white' opacity='.55'/></svg>">
+  <style>
+    :root {
+      --bg: #f7f8fa; --surface: #ffffff; --text: #14171f; --muted: #5b6475; --border: #dfe3ea;
+      --accent: #2563eb; --accent-text: #ffffff; --ok: #15803d; --warn: #b45309; --error: #b91c1c;
+      --shadow: 0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0e1116; --surface: #161a22; --text: #e8ebf1; --muted: #9aa3b5; --border: #2a303c;
+        --accent: #60a5fa; --accent-text: #0b1220; --ok: #4ade80; --warn: #fbbf24; --error: #f87171;
+        --shadow: none;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    main { max-width: 960px; margin: 0 auto; padding: 32px 16px 48px; }
+    header h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); line-height: 1.2; margin: 0 0 8px; letter-spacing: -0.01em; }
+    header p { margin: 0; color: var(--muted); max-width: 640px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 4px 10px;
+      border: 1px solid var(--border); border-radius: 999px; font-size: .85rem; color: var(--ok); background: var(--surface);
+    }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
+    #drop {
+      display: block; margin-top: 28px; padding: 36px 20px; text-align: center; border: 2px dashed var(--border);
+      border-radius: 14px; background: var(--surface); cursor: pointer; transition: border-color .15s, background .15s;
+    }
+    #drop:hover, #drop.over, #drop:focus-within { border-color: var(--accent); }
+    #drop.disabled { opacity: .55; pointer-events: none; }
+    #drop strong { display: block; font-size: 1.1rem; margin-bottom: 4px; }
+    #drop span { color: var(--muted); font-size: .95rem; }
+    #file { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    #status { margin: 12px 2px 0; color: var(--muted); font-size: .92rem; min-height: 1.4em; }
+    #status.error { color: var(--error); }
+    #samples { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    #samples:empty { display: none; }
+    #samples .label { color: var(--muted); font-size: .9rem; }
+    #samples button { padding: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: none; cursor: pointer; }
+    #samples img { display: block; width: 96px; height: 64px; object-fit: cover; }
+    #result { margin-top: 24px; padding: 16px; }
+    #view { display: block; width: 100%; height: auto; border-radius: 10px; background: var(--bg); }
+    .controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin-top: 14px; }
+    .controls label { display: inline-flex; align-items: center; gap: 8px; font-size: .95rem; }
+    input[type=range] { width: 160px; accent-color: var(--accent); }
+    input[type=checkbox] { accent-color: var(--accent); width: 16px; height: 16px; }
+    .spacer { flex: 1; }
+    button.btn {
+      font: inherit; font-size: .95rem; padding: 8px 14px; border-radius: 10px; cursor: pointer;
+      border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    }
+    button.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+    button.btn:focus-visible, #drop:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+    #summary { margin-top: 12px; font-size: .95rem; color: var(--muted); }
+    #summary strong { color: var(--text); }
+    .warn { color: var(--warn); }
+    h2 { font-size: 1.2rem; margin: 40px 0 12px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 12px; }
+    .stat { padding: 16px; }
+    .stat b { display: block; font-size: 1.6rem; line-height: 1.2; }
+    .stat span { color: var(--muted); font-size: .9rem; }
+    ol, ul { padding-left: 20px; margin: 0; }
+    li { margin: 6px 0; }
+    .note { padding: 16px 18px; color: var(--muted); font-size: .93rem; }
+    footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; }
+    footer a, .note a { color: var(--accent); }
+    @media (max-width: 560px) {
+      main { padding-top: 24px; }
+      .grid { grid-template-columns: 1fr 1fr; }
+      .stat b { font-size: 1.35rem; }
+      .controls { gap: 12px; }
+      input[type=range] { width: 120px; }
+      .spacer { display: none; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>License Plate Anonymiser</h1>
+    <p>Upload a street or vehicle photo and every detected license plate is blurred automatically.
+      A YOLOv8 detection model runs entirely in your browser.</p>
+    <div class="badge">🔒 Your photo never leaves your device. Nothing is uploaded or stored.</div>
+  </header>
+
+  <label id="drop" class="disabled">
+    <input id="file" type="file" accept="image/*">
+    <strong>Choose a photo or drop it here</strong>
+    <span>JPG, PNG or WebP · works on phones too</span>
+  </label>
+  <div id="samples"></div>
+  <p id="status" role="status" aria-live="polite">Loading…</p>
+
+  <section id="result" class="card" hidden>
+    <canvas id="view" aria-label="Anonymised image"></canvas>
+    <div class="controls">
+      <label>Confidence
+        <input id="conf" type="range" min="0.05" max="0.9" step="0.05" value="0.2">
+        <output id="confVal">0.20</output>
+      </label>
+      <label><input id="showBoxes" type="checkbox" checked> Show boxes</label>
+      <span class="spacer"></span>
+      <button id="toggle" class="btn" type="button" aria-pressed="false">Show original</button>
+      <button id="download" class="btn primary" type="button">Download</button>
+    </div>
+    <div id="summary"></div>
+  </section>
+
+  <h2>How it works</h2>
+  <div class="card note">
+    <ol>
+      <li><strong>Detect.</strong> A YOLOv8s model finds every license plate in the image.</li>
+      <li><strong>Pad.</strong> Each box is enlarged by 15% on every side, so a slightly tight box cannot leave a plate edge readable.</li>
+      <li><strong>Blur.</strong> A Gaussian blur, as wide as the plate itself, is applied inside each box only. The rest of the image is untouched.</li>
+    </ol>
+    <p style="margin:12px 0 0">The confidence threshold defaults to 0.2: a missed plate is a privacy risk, while an extra blur is harmless.
+      Detections below 0.5 are marked <span class="warn">review</span> (green and amber boxes are shown on screen only, never in the download).</p>
+  </div>
+
+  <h2>Model performance</h2>
+  <p style="margin:0 0 12px;color:var(--muted)">Measured on a held-out test set of 386 real-world street images with 512 plates.</p>
+  <div class="grid">
+    <div class="card stat"><b>90%</b><span>of plates fully covered by the blur at threshold 0.2</span></div>
+    <div class="card stat"><b>0.92</b><span>mAP@50 (precision 0.92, recall 0.88)</span></div>
+    <div class="card stat"><b>25K</b><span>training images, fine-tuned from YOLOv8s</span></div>
+    <div class="card stat"><b>22 MB</b><span>model, downloaded once and cached by the browser</span></div>
+  </div>
+
+  <h2>Limitations</h2>
+  <div class="card note">
+    <ul>
+      <li>This is a prototype. Very small or distant plates (under about 40 pixels wide) are the most likely to be missed.</li>
+      <li>Always check the result before publishing a photo. Lower the confidence slider if a plate is not blurred.</li>
+      <li>The first run downloads the model; later visits load it from the browser cache.</li>
+    </ul>
+  </div>
+
+  <footer>
+    Built with <a href="https://github.com/ultralytics/ultralytics">Ultralytics YOLOv8</a> and
+    <a href="https://onnxruntime.ai/">ONNX Runtime Web</a>. Source code available under the
+    <a href="LICENSE">AGPL-3.0 licence</a> in this <a href="https://github.com/anuj87in/license-plate-anonymiser">GitHub repository</a>.
+  </footer>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>
