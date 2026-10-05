@@ -40,6 +40,7 @@ async function loadModel() {
   if (!session) throw new Error('This browser cannot run the model.');
   setStatus(`Model ready (${backend}). Choose a photo to anonymise.`);
   els.drop.classList.remove('disabled');
+  els.samples?.classList.remove('disabled');
 }
 
 // ---------- pre-processing: letterbox to 640 x 640, grey (114) padding ----------
@@ -181,6 +182,7 @@ async function process(file, name) {
   current = { name: (name || 'image').replace(/\.[^.]+$/, ''), source, candidates, ms };
   showOriginal = false;
   render();
+  setStatus('Done. Check the result below, or choose another photo.');
   els.result.hidden = false;
   els.result.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -279,6 +281,7 @@ els.download.addEventListener('click', download);
 els.samples?.addEventListener('click', async (e) => {
   const btn = e.target.closest('[data-src]');
   if (!btn) return;
+  setStatus('Loading sample…');
   const blob = await (await fetch(btn.dataset.src)).blob();
   process(blob, btn.dataset.src.split('/').pop());
 });

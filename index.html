@@ -44,7 +44,7 @@
     #status { margin: 12px 2px 0; color: var(--muted); font-size: .92rem; min-height: 1.4em; }
     #status.error { color: var(--error); }
     #samples { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-    #samples:empty { display: none; }
+    #samples.disabled { opacity: .55; pointer-events: none; }
     #samples .label { color: var(--muted); font-size: .9rem; }
     #samples button { padding: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: none; cursor: pointer; }
     #samples img { display: block; width: 96px; height: 64px; object-fit: cover; }
@@ -98,7 +98,13 @@
     <strong>Choose a photo or drop it here</strong>
     <span>JPG, PNG or WebP · works on phones too</span>
   </label>
-  <div id="samples"></div>
+  <div id="samples" class="disabled">
+    <span class="label">Or try a sample:</span>
+    <button type="button" data-src="samples/car-rear-closeup.jpg" aria-label="Sample: car, rear close-up"><img src="samples/car-rear-closeup-thumb.jpg" alt="" loading="lazy"></button>
+    <button type="button" data-src="samples/car-rear-parking.jpg" aria-label="Sample: car in a parking garage"><img src="samples/car-rear-parking-thumb.jpg" alt="" loading="lazy"></button>
+    <button type="button" data-src="samples/scooter-and-bike.jpg" aria-label="Sample: scooter and motorbike, two plates"><img src="samples/scooter-and-bike-thumb.jpg" alt="" loading="lazy"></button>
+    <button type="button" data-src="samples/two-wheeler-parking.jpg" aria-label="Sample: two-wheeler parking, two plates"><img src="samples/two-wheeler-parking-thumb.jpg" alt="" loading="lazy"></button>
+  </div>
   <p id="status" role="status" aria-live="polite">Loading…</p>
 
   <section id="result" class="card" hidden>
@@ -140,6 +146,7 @@
   <div class="card note">
     <ul>
       <li>This is a prototype. Very small or distant plates (under about 40 pixels wide) are the most likely to be missed.</li>
+      <li>Plates that are rotated, heavily covered (for example by a garland) or on the front of some motorbikes can also be missed; the training data contained few such cases.</li>
       <li>Always check the result before publishing a photo. Lower the confidence slider if a plate is not blurred.</li>
       <li>The first run downloads the model; later visits load it from the browser cache.</li>
     </ul>
