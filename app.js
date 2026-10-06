@@ -183,6 +183,10 @@ async function process(file, name) {
 
   current = { name: (name || 'image').replace(/\.[^.]+$/, ''), source, candidates, ms };
   showOriginal = false;
+  // Every new image starts at the default (lowest) threshold, so a setting chosen for the previous
+  // image cannot hide plates in this one.
+  els.conf.value = els.conf.defaultValue;
+  els.confVal.textContent = Number(els.conf.value).toFixed(2);
   render();
   setStatus('Done. Check the result below, or choose another photo.');
   els.result.hidden = false;
