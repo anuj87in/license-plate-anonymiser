@@ -116,8 +116,8 @@
     <canvas id="view" aria-label="Anonymised image"></canvas>
     <div class="controls">
       <label>Confidence
-        <input id="conf" type="range" min="0.05" max="0.9" step="0.05" value="0.2">
-        <output id="confVal">0.20</output>
+        <input id="conf" type="range" min="0.05" max="0.9" step="0.05" value="0.05">
+        <output id="confVal">0.05</output>
       </label>
       <label><input id="showBoxes" type="checkbox" checked> Show boxes</label>
       <span class="spacer"></span>
@@ -134,14 +134,15 @@
       <li><strong>Pad.</strong> Each box is enlarged by 15% on every side, so a slightly tight box cannot leave a plate edge readable.</li>
       <li><strong>Blur.</strong> A Gaussian blur, as wide as the plate itself, is applied inside each box only. The rest of the image is untouched.</li>
     </ol>
-    <p style="margin:12px 0 0">The confidence threshold defaults to 0.2: a missed plate is a privacy risk, while an extra blur is harmless.
-      Detections below 0.5 are marked <span class="warn">review</span> (green and amber boxes are shown on screen only, never in the download).</p>
+    <p style="margin:12px 0 0">The confidence threshold starts at its lowest setting (0.05), so anything that might be a plate is blurred,
+      including plates from countries the model saw little of during training. A missed plate is a privacy risk, while an extra blur is harmless.
+      Raise the slider to remove unneeded blurs and see how confident the model is about each plate. Detections below 0.5 are marked <span class="warn">review</span> (green and amber boxes are shown on screen only, never in the download).</p>
   </div>
 
   <h2>Model performance</h2>
   <p style="margin:0 0 12px;color:var(--muted)">Measured on a held-out test set of 386 real-world street images with 512 plates.</p>
   <div class="grid">
-    <div class="card stat"><b>90%</b><span>of plates fully covered by the blur at threshold 0.2</span></div>
+    <div class="card stat"><b>92%</b><span>of plates fully covered by the blur at the default threshold (0.05)</span></div>
     <div class="card stat"><b>0.92</b><span>mAP@50 (precision 0.92, recall 0.88)</span></div>
     <div class="card stat"><b>25K</b><span>training images, fine-tuned from YOLOv8s</span></div>
     <div class="card stat"><b>22 MB</b><span>model, downloaded once and cached by the browser</span></div>
@@ -157,7 +158,7 @@
     <ul>
       <li>This is a prototype. Very small or distant plates (under about 40 pixels wide) are the most likely to be missed.</li>
       <li>Plates that are rotated, heavily covered (for example by a garland) or on the front of some motorbikes can also be missed; the training data contained few such cases.</li>
-      <li>Always check the result before publishing a photo. Lower the confidence slider if a plate is not blurred.</li>
+      <li>The low default threshold also blurs some regions that are not plates (for example lights, logos or signs). Raise the slider to remove them, and always check the result before publishing a photo.</li>
       <li>The first run downloads the model; later visits load it from the browser cache.</li>
     </ul>
   </div>

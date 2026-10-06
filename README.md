@@ -20,8 +20,19 @@ Images are never uploaded: there is no server, no database and no tracking.
 3. **Blur.** A Gaussian blur as wide as the plate is applied inside each box only. The rest of
    the image is left untouched.
 
-The confidence threshold defaults to 0.2 (recall first: a missed plate is a privacy risk, an
-extra blur is harmless). Detections below 0.5 are flagged for review on screen.
+The confidence threshold starts at its lowest setting, 0.05 (recall first: a missed plate is a
+privacy risk, an extra blur is harmless). This also blurs plates from countries the model saw little
+of during training; raising the slider removes unneeded blurs. Detections below 0.5 are flagged for
+review on screen.
+
+| Threshold | Plates fully covered | Plates missed | Blur boxes on regions with no plate |
+|---|---|---|---|
+| 0.05 (default) | 92.2% | 23 | 119 |
+| 0.1 | 90.8% | 30 | 79 |
+| 0.2 | 90.4% | 34 | 51 |
+| 0.5 | 82.8% | 84 | 16 |
+
+Measured with the web model on the test set (386 images, 512 plates).
 
 ## Model
 
@@ -33,7 +44,7 @@ extra blur is harmless). Detections below 0.5 are flagged for review on screen.
 | Test set | 386 real-world street images, 512 plates |
 | Precision / recall | 0.920 / 0.879 |
 | mAP@50 / mAP@50-95 | 0.921 / 0.682 |
-| Plates fully covered by the blur at threshold 0.2 | 90.2% |
+| Plates fully covered by the blur at threshold 0.2 (original PyTorch model) | 90.2% |
 | Web model | `model/plate_fp16.onnx`, FP16 weights (22 MB), verified to match the original model's coverage on the test set |
 
 Very small or distant plates (under about 40 px wide) are the most likely to be missed. Always
