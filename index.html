@@ -55,12 +55,12 @@
     input[type=range] { width: 160px; accent-color: var(--accent); }
     input[type=checkbox] { accent-color: var(--accent); width: 16px; height: 16px; }
     .spacer { flex: 1; }
-    button.btn {
+    button.btn, a.btn {
       font: inherit; font-size: .95rem; padding: 8px 14px; border-radius: 10px; cursor: pointer;
       border: 1px solid var(--border); background: var(--surface); color: var(--text);
     }
-    button.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
-    button.btn:focus-visible, #drop:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+    button.btn.primary, a.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+    button.btn:focus-visible, a.btn:focus-visible, #drop:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
     #summary { margin-top: 12px; font-size: .95rem; color: var(--muted); }
     #summary strong { color: var(--text); }
     .warn { color: var(--warn); }
@@ -78,9 +78,21 @@
     ol, ul { padding-left: 20px; margin: 0; }
     li { margin: 6px 0; }
     .note { padding: 16px 18px; color: var(--muted); font-size: .93rem; }
+    .author { display: grid; grid-template-columns: 140px 1fr; gap: 24px; padding: 20px; align-items: start; }
+    .author img.photo { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; display: block; }
+    .author h3 { margin: 0 0 2px; font-size: 1.25rem; }
+    .author .role { margin: 0 0 12px; color: var(--muted); font-size: .95rem; }
+    .author p { margin: 0 0 10px; }
+    .connect { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .connect .links { display: flex; flex-wrap: wrap; gap: 8px; }
+    .connect a.btn { text-decoration: none; display: inline-block; }
+    .connect img.qr { width: 96px; height: 96px; border-radius: 8px; background: #fff; padding: 4px; }
+    .credit { margin-top: 10px; font-style: italic; }
     footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; }
     footer a, .note a { color: var(--accent); }
     @media (max-width: 560px) {
+      .author { grid-template-columns: 1fr; justify-items: start; }
+      .connect img.qr { display: none; }
       main { padding-top: 24px; }
       .grid { grid-template-columns: 1fr 1fr; }
       .stat b { font-size: 1.35rem; }
@@ -150,7 +162,7 @@
   <a class="card report" href="report/License_Plate_Anonymisation_Report.pdf" target="_blank" rel="noopener">
     <span class="report-icon" aria-hidden="true">📄</span>
     <span><strong>Read the full technical report</strong>
-      <span class="report-sub">Data audit, exploratory analysis, model design, training and evaluation · PDF, 31 pages, 6 MB</span></span>
+      <span class="report-sub">Data audit, exploratory analysis, model design, training and evaluation · PDF, 32 pages, 6 MB</span></span>
   </a>
 
   <h2>Limitations</h2>
@@ -163,10 +175,37 @@
     </ul>
   </div>
 
+  <h2>About the author</h2>
+  <section class="card author" aria-labelledby="author-name">
+    <img class="photo" src="author/anuj-puranik.jpg" alt="Anuj Puranik" width="140" height="140" loading="lazy">
+    <div>
+      <h3 id="author-name">Anuj Puranik</h3>
+      <p class="role">IT professional · Machine learning enthusiast</p>
+      <p>Anuj Puranik has 16 years of experience in the IT industry, working in the telecom domain, and is a
+        machine learning enthusiast who enjoys turning models into tools that people can use. Formal education
+        includes a PhD, an M.Tech and a B.Tech.</p>
+      <p>This case study covers the full workflow: auditing the client data, training and evaluating the
+        detector, and shipping this free, in-browser prototype.</p>
+      <p>Outside work: automobiles, especially motorcycles, and cricket.</p>
+      <div class="connect">
+        <img class="qr" src="author/linktree-qr.png" alt="QR code linking to linktr.ee/anuj87in" width="96" height="96" loading="lazy">
+        <div>
+          <p style="margin:0 0 8px"><strong>Connect</strong> <span style="color:var(--muted)">· scan the code or pick a link</span></p>
+          <div class="links">
+            <a class="btn" href="https://www.linkedin.com/in/anujpuranik/" target="_blank" rel="noopener">LinkedIn</a>
+            <a class="btn" href="https://github.com/anuj87in" target="_blank" rel="noopener">GitHub</a>
+            <a class="btn primary" href="https://linktr.ee/anuj87in" target="_blank" rel="noopener">All links</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <footer>
     Built with <a href="https://github.com/ultralytics/ultralytics">Ultralytics YOLOv8</a> and
     <a href="https://onnxruntime.ai/">ONNX Runtime Web</a>. Source code available under the
     <a href="LICENSE">AGPL-3.0 licence</a> in this <a href="https://github.com/anuj87in/license-plate-anonymiser">GitHub repository</a>.
+    <p class="credit">Developed with assistance from Claude, an AI model by Anthropic.</p>
   </footer>
 </main>
 <script type="module" src="app.js"></script>

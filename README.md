@@ -5,7 +5,7 @@ Blur license plates in photos, directly in the browser.
 **Live demo:** https://anuj87in.github.io/license-plate-anonymiser/
 
 **Full technical report:** [License_Plate_Anonymisation_Report.pdf](report/License_Plate_Anonymisation_Report.pdf)
-(data audit, exploratory analysis, model design, training and evaluation; 31 pages)
+(data audit, exploratory analysis, model design, training and evaluation; 32 pages)
 
 A YOLOv8s detection model runs on the visitor's own device through
 [ONNX Runtime Web](https://onnxruntime.ai/) (WebGPU where available, WebAssembly otherwise).
@@ -71,7 +71,15 @@ samples/               example photos (optional)
 report/                full technical report (PDF)
 ```
 
+## Author
+
+**Anuj Puranik**: [LinkedIn](https://www.linkedin.com/in/anujpuranik/) · [GitHub](https://github.com/anuj87in) · [All links](https://linktr.ee/anuj87in)
+
 ## Licence
 
 AGPL-3.0, as required by [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics),
 which was used to train the model. See [LICENSE](LICENSE).
+
+---
+
+*Developed with assistance from Claude, an AI model by Anthropic.*
