@@ -43,6 +43,8 @@
     #file { position: absolute; width: 1px; height: 1px; opacity: 0; }
     #status { margin: 12px 2px 0; color: var(--muted); font-size: .92rem; min-height: 1.4em; }
     #status.error { color: var(--error); }
+    #paste-row { margin-top: 12px; }
+    kbd { font: inherit; font-size: .85em; padding: 1px 6px; border: 1px solid var(--border); border-radius: 5px; background: var(--bg); }
     #samples { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
     #samples.disabled { opacity: .55; pointer-events: none; }
     #samples .label { color: var(--muted); font-size: .9rem; }
@@ -113,9 +115,12 @@
 
   <label id="drop" class="disabled">
     <input id="file" type="file" accept="image/*">
-    <strong>Choose a photo or drop it here</strong>
-    <span>JPG, PNG or WebP · works on phones too</span>
+    <strong>Choose a photo, drop it here or paste it</strong>
+    <span>Paste a copied image or screenshot with <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>V</kbd> · JPG, PNG or WebP · works on phones too</span>
   </label>
+  <div id="paste-row" hidden>
+    <button id="pasteBtn" class="btn" type="button">📋 Paste image from clipboard</button>
+  </div>
   <div id="samples" class="disabled">
     <span class="label">Or try a sample:</span>
     <button type="button" data-src="samples/car-rear-closeup.jpg" aria-label="Sample: car, rear close-up"><img src="samples/car-rear-closeup-thumb.jpg" alt="" loading="lazy"></button>

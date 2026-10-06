@@ -16,6 +16,7 @@ const els = {
   drop: $('drop'), file: $('file'), status: $('status'), result: $('result'),
   view: $('view'), conf: $('conf'), confVal: $('confVal'), boxes: $('showBoxes'),
   toggle: $('toggle'), download: $('download'), summary: $('summary'), samples: $('samples'),
+  pasteRow: $('paste-row'), pasteBtn: $('pasteBtn'),
 };
 
 let session = null;
@@ -41,6 +42,7 @@ async function loadModel() {
   setStatus(`Model ready (${backend}). Choose a photo to anonymise.`);
   els.drop.classList.remove('disabled');
   els.samples?.classList.remove('disabled');
+  if (navigator.clipboard?.read) els.pasteRow.hidden = false;  // the keyboard shortcut works everywhere
 }
 
 // ---------- pre-processing: letterbox to 640 x 640, grey (114) padding ----------
@@ -284,6 +286,31 @@ els.samples?.addEventListener('click', async (e) => {
   setStatus('Loading sample…');
   const blob = await (await fetch(btn.dataset.src)).blob();
   process(blob, btn.dataset.src.split('/').pop());
+});
+
+// Paste: Cmd/Ctrl + V anywhere on the page, or the button (clipboard API, where the browser has it).
+document.addEventListener('paste', (e) => {
+  const item = [...(e.clipboardData?.items || [])].find((i) => i.type.startsWith('image/'));
+  if (!item) {
+    if (!e.clipboardData?.types?.includes('text/plain')) setStatus('The clipboard does not contain an image. Copy an image or take a screenshot first.', true);
+    return;
+  }
+  e.preventDefault();
+  process(item.getAsFile(), 'pasted-image');
+});
+els.pasteBtn.addEventListener('click', async () => {
+  try {
+    for (const item of await navigator.clipboard.read()) {
+      const type = item.types.find((t) => t.startsWith('image/'));
+      if (type) {
+        process(await item.getType(type), 'pasted-image');
+        return;
+      }
+    }
+    setStatus('The clipboard does not contain an image. Copy an image or take a screenshot first.', true);
+  } catch {
+    setStatus('The browser blocked clipboard access. Press ⌘/Ctrl + V instead, or choose a file.', true);
+  }
 });
 
 loadModel().catch((err) => setStatus(`${err.message} Please try a recent version of Chrome, Edge, Firefox or Safari.`, true));
